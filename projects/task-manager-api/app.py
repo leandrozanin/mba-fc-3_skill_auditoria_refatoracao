@@ -1,46 +1,34 @@
-import os
-
 from flask import Flask
 from flask_cors import CORS
-
 from database import db
+from routes.task_routes import task_bp
+from routes.user_routes import user_bp
+from routes.report_routes import report_bp
+import os, sys, json, datetime
 
+app = Flask(__name__)
 
-def create_app(test_config=None):
-    app = Flask(__name__)
-    app.config.from_mapping(
-        SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL', 'sqlite:///tasks.db'),
-        SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        SECRET_KEY=os.environ.get('SECRET_KEY') or os.urandom(32),
-    )
-    if test_config:
-        app.config.update(test_config)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'super-secret-key-123'
 
-    db.init_app(app)
-    CORS(app, origins=os.environ.get('CORS_ORIGINS', '').split(',') or [])
+CORS(app)
+db.init_app(app)
 
-    from models import Category, Task, User
-    from routes.report_routes import report_bp
-    from routes.task_routes import task_bp
-    from routes.user_routes import user_bp
+app.register_blueprint(task_bp)
+app.register_blueprint(user_bp)
+app.register_blueprint(report_bp)
 
-    with app.app_context():
-        db.create_all()
+@app.route('/health')
+def health():
+    return {'status': 'ok', 'timestamp': str(datetime.datetime.now())}
 
-    app.register_blueprint(task_bp)
-    app.register_blueprint(user_bp)
-    app.register_blueprint(report_bp)
+@app.route('/')
+def index():
+    return {'message': 'Task Manager API', 'version': '1.0'}
 
-    @app.route('/health')
-    def health():
-        return {'status': 'ok'}
-
-    @app.route('/')
-    def index():
-        return {'message': 'Task Manager API', 'version': '1.0'}
-
-    return app
-
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
-    create_app().run(debug=False, host='127.0.0.1', port=int(os.environ.get('PORT', '5000')))
+    app.run(debug=True, host='0.0.0.0', port=5000)

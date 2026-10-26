@@ -10,9 +10,9 @@ Desafio 3: a skill `refactor-arch` existe na raiz para Codex e Claude Code. Para
 | `ecommerce-api-legacy` | `projects/ecommerce-api-legacy/.claude/skills/refactor-arch/` | `reports/audit-project-2.md` |
 | `task-manager-api` | `projects/task-manager-api/.claude/skills/refactor-arch/` | `reports/audit-project-3.md` |
 
-Os três relatórios incluem a auditoria inicial e a evidência da Fase 3. A Fase 3 foi autorizada para os três projetos nesta revisão. Cada projeto preserva suas rotas existentes, separa composição/configuração, valida entradas e adiciona testes de regressão.
+Os três projetos foram restaurados ao código original do commit `30a7300`, antes da refatoração. As skills e os relatórios foram preservados. Os resultados da Fase 3 nos relatórios e nas seções abaixo são históricos e correspondem à refatoração recuperável no commit `715baea`.
 
-## Testes locais
+## Testes da refatoração anterior (histórico)
 
 ```powershell
 cd projects/code-smells-project
@@ -27,7 +27,7 @@ cd ..\task-manager-api
 
 Instale as dependências de cada projeto antes de executar os testes. A suíte cobre contratos e regressões em memória/SQLite temporário; não exige Docker nem serviços externos.
 
-## Estrutura
+## Estrutura da refatoração anterior (histórico)
 
 - Projeto 1: `config/`, `views/`, `controllers/`, `models/` e `middlewares/`; remove execução arbitrária de SQL e protege credenciais.
 - Projeto 2: `src/config/`, `src/views/`, `src/controllers/`, `src/models/` e `src/middlewares/`; checkout transacional e logs sem dados de pagamento.

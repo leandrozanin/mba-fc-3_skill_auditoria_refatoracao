@@ -4,7 +4,6 @@ from models.task import Task
 from models.user import User
 from models.category import Category
 from datetime import datetime, timedelta
-from sqlalchemy import case, func
 from utils.helpers import format_date, calculate_percentage
 import json
 
@@ -51,19 +50,18 @@ def summary_report():
         Task.updated_at >= seven_days_ago
     ).count()
 
-    user_rows = db.session.query(
-        User.id,
-        User.name,
-        func.count(Task.id),
-        func.sum(case((Task.status == 'done', 1), else_=0)),
-    ).outerjoin(Task, Task.user_id == User.id).group_by(User.id, User.name).all()
+    users = User.query.all()
     user_stats = []
-    for user_id, user_name, total, completed in user_rows:
-        total = total or 0
-        completed = completed or 0
+    for u in users:
+        user_tasks = Task.query.filter_by(user_id=u.id).all()
+        total = len(user_tasks)
+        completed = 0
+        for t in user_tasks:
+            if t.status == 'done':
+                completed = completed + 1
         user_stats.append({
-            'user_id': user_id,
-            'user_name': user_name,
+            'user_id': u.id,
+            'user_name': u.name,
             'total_tasks': total,
             'completed_tasks': completed,
             'completion_rate': round((completed / total) * 100, 2) if total > 0 else 0
