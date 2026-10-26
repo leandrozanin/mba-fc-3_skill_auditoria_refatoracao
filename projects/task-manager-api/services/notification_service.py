@@ -1,27 +1,31 @@
 import smtplib
+import logging
+import os
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class NotificationService:
     def __init__(self):
         self.notifications = []
-        self.email_host = 'smtp.gmail.com'
-        self.email_port = 587
-        self.email_user = 'taskmanager@gmail.com'
-        self.email_password = 'senha123'
+        self.email_host = os.environ.get('SMTP_HOST', '')
+        self.email_port = int(os.environ.get('SMTP_PORT', '587'))
+        self.email_user = os.environ.get('SMTP_USER', '')
+        self.email_password = os.environ.get('SMTP_PASSWORD', '')
 
     def send_email(self, to, subject, body):
+        if not all((self.email_host, self.email_user, self.email_password)):
+            logger.warning('SMTP is not configured; notification was not sent')
+            return False
         try:
-
-            server = smtplib.SMTP(self.email_host, self.email_port)
-            server.starttls()
-            server.login(self.email_user, self.email_password)
-            message = f"Subject: {subject}\n\n{body}"
-            server.sendmail(self.email_user, to, message)
-            server.quit()
-            print(f"Email enviado para {to}")
+            with smtplib.SMTP(self.email_host, self.email_port, timeout=10) as server:
+                server.starttls()
+                server.login(self.email_user, self.email_password)
+                message = f"Subject: {subject}\n\n{body}"
+                server.sendmail(self.email_user, to, message)
             return True
-        except Exception as e:
-            print(f"Erro ao enviar email: {str(e)}")
+        except (OSError, smtplib.SMTPException):
+            logger.exception('Unable to deliver notification')
             return False
 
     def notify_task_assigned(self, user, task):

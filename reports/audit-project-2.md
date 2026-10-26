@@ -125,5 +125,18 @@
 ## APIs deprecated
 Nenhuma identificada após checagem do uso de Express 4.22 (`express.json()`, `app.get/post/delete`, `res.status().send/json` — sem as assinaturas removidas/deprecadas como `res.send(status)` ou `res.json(status, obj)`) e de `sqlite3` 5.1 (`Database`, `serialize`, `run`, `get`, `all`, `verbose()`). Não foi executado `npm audit` (sem `node_modules`); nenhuma CVE é alegada.
 
+## Baseline runtime validation (2026-10-26)
+
+- Baseline: Node.js 24.22.1, npm 11.19.1, Express 4.22.1 e sqlite3 5.1.7. npm ci --no-audit --no-fund instalou dependências.
+- Servidor efêmero com SQLite em memória retornou HTTP 200 para GET /api/admin/financial-report, POST /api/checkout válido e DELETE /api/users/:id.
+- O checkout imprimiu dados de cartão e chave de pagamento em stdout. Os valores usados no teste são sintéticos e foram omitidos. O projeto não tinha script ou testes automatizados.
+
 ## Gate da Fase 2
-A auditoria não alterou o código-alvo. Aprovar a Fase 3? (sim/não)
+A auditoria original não alterou o código-alvo. A autorização da solicitante para executar a Fase 3 nos três projetos foi registrada nesta revisão.
+
+## Execução da Fase 3 (2026-10-26)
+
+- Refatoração: `AppManager.js` e utilitários monolíticos substituídos por configuração, rotas, controller, repository e middleware; checkout em transação; relatórios com joins; senha com hash; dados de cartão/chaves removidos dos logs.
+- Verificação: `npm test` — 4/4 testes aprovados; validou relatório, entrada de checkout, persistência e remoção de usuário com vínculos.
+- Endpoints: GET do relatório, POST de checkout e DELETE de usuário validados em servidor efêmero SQLite; resposta de relatório e checkout mantêm seus contratos principais.
+- Limitação: testes de integração externos ficam a cargo da solicitante; auditoria de dependências não foi executada nesta fase.

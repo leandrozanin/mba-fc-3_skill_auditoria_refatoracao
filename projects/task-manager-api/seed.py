@@ -1,11 +1,12 @@
 """Script para popular o banco com dados iniciais"""
-from app import app, db
+from app import create_app, db
 from models.task import Task
 from models.user import User
 from models.category import Category
 from datetime import datetime, timedelta
 
-def seed_data():
+def seed_data(app=None):
+    app = app or create_app()
     with app.app_context():
 
         Task.query.delete()
@@ -96,4 +97,4 @@ def seed_data():
         print(f"  {Task.query.count()} tasks")
 
 if __name__ == '__main__':
-    seed_data()
+    seed_data(create_app())

@@ -102,6 +102,10 @@ def create_task():
     description = data.get('description', '')
     status = data.get('status', 'pending')
     priority = data.get('priority', 3)
+    try:
+        priority = int(priority)
+    except (TypeError, ValueError):
+        return jsonify({'error': 'Prioridade inválida'}), 400
     user_id = data.get('user_id')
     category_id = data.get('category_id')
     due_date = data.get('due_date')
