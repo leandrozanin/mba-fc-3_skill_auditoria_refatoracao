@@ -159,18 +159,5 @@
 ## APIs deprecated
 Nenhuma identificada após checagem do uso de Flask 3.1 (`add_url_rule`, `route`, `request.get_json`, `jsonify` — todos APIs atuais) e de `sqlite3` (não há uso de adaptadores/conversores de `datetime` padrão, deprecados no Python 3.12; nem `datetime.utcnow()`). Não foi rodado scanner de vulnerabilidades de dependências (`pip-audit`); nenhuma CVE é alegada.
 
-## Baseline runtime validation (2026-10-26)
-
-- Test client Flask com SQLite local: 10 endpoints GET representativos retornaram HTTP 200 (raiz, catálogo/busca/detalhe de produtos, lista/detalhe de usuários, lista de pedidos, pedidos por usuário, relatório de vendas e health).
-- POST /admin/query com SELECT 1 retornou HTTP 200, confirmando a execução SQL sem autenticação. Não foram enviados comandos destrutivos nem reset de banco.
-- Baseline: Python 3.12.10, Flask 3.1.1 e Flask-CORS 5.0.1. O projeto não tinha testes automatizados.
-
 ## Gate da Fase 2
-A auditoria original não alterou o código-alvo. A autorização da solicitante para executar a Fase 3 nos três projetos foi registrada nesta revisão.
-
-## Execução da Fase 3 (2026-10-26)
-
-- Refatoração: app factory; config, views, controllers, models e middleware separados; consultas parametrizadas; remoção do endpoint `/admin/query` (410) e bloqueio do reset destrutivo (403); hashes de senha e respostas sem credenciais.
-- Verificação: `python -m unittest discover -s tests -v` — 8/8 testes aprovados; testes cobrem health, bloqueios administrativos, validação e SQL injection por entrada.
-- Baseline HTTP preservada para rotas não administrativas (10 GETs representativos 200); comportamento de `/admin/query` intencionalmente retirado por risco crítico.
-- Limitação: testes de integração externos ficam a cargo da solicitante; scanner de vulnerabilidades não foi executado.
+A auditoria não alterou o código-alvo. Aprovar a Fase 3? (sim/não)

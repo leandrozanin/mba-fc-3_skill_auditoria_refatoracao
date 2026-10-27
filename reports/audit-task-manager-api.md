@@ -143,18 +143,5 @@
 ## APIs deprecated
 Ver achado **[MEDIUM] APIs deprecated/legadas em uso**: `datetime.utcnow()` (deprecated no Python 3.12+) e `Query.get()` (legado no SQLAlchemy 2.0, usado via Flask-SQLAlchemy 3.1). Demais APIs do Flask 3.0 usadas (`Blueprint`, `route`, `request.get_json`, `jsonify`, retorno de `dict`) são atuais. Não foi executado `pip-audit`; nenhuma CVE é alegada para as versões fixadas.
 
-## Baseline runtime validation (2026-10-26)
-
-- python seed.py criou 3 usuários, 4 categorias e 10 tarefas no SQLite descartável do clone. A execução emitiu DeprecationWarning para datetime.utcnow().
-- O cliente de teste Flask retornou HTTP 200 em 12 GETs representativos: raiz, health, tasks (lista/detalhe/busca/estatísticas), users (lista/detalhe/tarefas), relatórios (resumo/usuário) e categorias.
-- Baseline: Python 3.12.10, Flask 3.0.0, Flask-SQLAlchemy 3.1.1 e SQLAlchemy 2.1.6. O projeto não tinha testes automatizados.
-
 ## Gate da Fase 2
-A auditoria original não alterou o código-alvo. A autorização da solicitante para executar a Fase 3 nos três projetos foi registrada nesta revisão.
-
-## Execução da Fase 3 (2026-10-26)
-
-- Refatoração: app factory sem debug e sem segredo fixo; `DATABASE_URL`, `SECRET_KEY`, `CORS_ORIGINS` e SMTP externos; hashes adaptativos de senha com upgrade de hashes MD5 legados no login; serializers não retornam senha; prioridade inválida recebe 400; relatório de produtividade agrega usuários/tasks em consulta única.
-- Verificação: `python -m unittest discover -s tests -v` — 6/6 testes aprovados; 12 GETs representativos com dados seedados retornaram 200; seed funciona com app factory e banco temporário.
-- Achados endereçados: segredo da aplicação/SMTP, N+1 no relatório, exposição de hash, validação de prioridade. Permanecem usos de `datetime.utcnow()`, `Query.get()`, blocos de exceção amplos e o token demonstrativo de login; não foram declarados resolvidos.
-- Limitação: SMTP real e testes de integração externos não foram executados. O teste de seed confirma warnings das APIs de data/ORM ainda listadas na auditoria.
+A auditoria não alterou o código-alvo. Aprovar a Fase 3? (sim/não)

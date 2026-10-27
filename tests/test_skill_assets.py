@@ -66,24 +66,12 @@ class RefactorArchSkillAssetsTests(unittest.TestCase):
 
         self.assertEqual(codex_files, claude_files)
 
-    def test_each_project_contains_an_identical_claude_skill_copy(self):
-        canonical_files = {
-            path.relative_to(CLAUDE_SKILL_ROOT): path.read_bytes()
-            for path in CLAUDE_SKILL_ROOT.rglob("*")
-            if path.is_file()
-        }
-
-        for project in sorted((REPOSITORY_ROOT / "projects").iterdir()):
+    def test_project_fixtures_do_not_embed_duplicate_skill_copies(self):
+        for project in (REPOSITORY_ROOT / "projects").iterdir():
             if project.is_dir():
-                project_skill = project / ".claude" / "skills" / "refactor-arch"
-                project_files = {
-                    path.relative_to(project_skill): path.read_bytes()
-                    for path in project_skill.rglob("*")
-                    if path.is_file()
-                }
                 with self.subTest(project=project.name):
-                    self.assertEqual(project_files, canonical_files)
                     self.assertFalse((project / ".agents" / "skills" / "refactor-arch" / "SKILL.md").exists())
+                    self.assertFalse((project / ".claude" / "skills" / "refactor-arch" / "SKILL.md").exists())
 
 
 if __name__ == "__main__":
